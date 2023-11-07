@@ -4,6 +4,8 @@ from io import BytesIO
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import matplotlib as mpl
+import numpy as np
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -37,8 +39,38 @@ def crop_image(image, row_min, row_max):
     cropped_image = image.crop((0, row_min, width, row_max))
     return cropped_image
 
+def apply_colormap(image):
+    cdict = {'red': ((0.0, 0.0, 0.0),
+                 (0.1, 0.5, 0.5),
+                 (0.2, 0.0, 0.0),
+                 (0.4, 0.2, 0.2),
+                 (0.6, 0.0, 0.0),
+                 (0.8, 1.0, 1.0),
+                 (1.0, 1.0, 1.0)),
+        'green':((0.0, 0.0, 0.0),
+                 (0.1, 0.0, 0.0),
+                 (0.2, 0.0, 0.0),
+                 (0.4, 1.0, 1.0),
+                 (0.6, 1.0, 1.0),
+                 (0.8, 1.0, 1.0),
+                 (1.0, 0.0, 0.0)),
+        'blue': ((0.0, 0.0, 0.0),
+                 (0.1, 0.5, 0.5),
+                 (0.2, 1.0, 1.0),
+                 (0.4, 1.0, 1.0),
+                 (0.6, 0.0, 0.0),
+                 (0.8, 0.0, 0.0),
+                 (1.0, 0.0, 0.0))}
+
+    cust_cmap = mpl.colors.LinearSegmentedColormap('my_colormap',cdict,256)
+    im = np.array(image)
+    im = cust_cmap(im)
+    img = Image.fromarray((im[:, :, :3] * 255).astype(np.uint8))
+    img.save('test.png')
+    return img
+
 @app.get("/frames/")
-async def retrieve_images(depth_min: int, depth_max: int):
+def retrieve_images(depth_min: int, depth_max: int):
     try:
         # Retrieve image data from the database within the specified row range
         retrieve_query = "SELECT image_data FROM images"
@@ -56,7 +88,9 @@ async def retrieve_images(depth_min: int, depth_max: int):
             image = Image.open(BytesIO(image_data))
             # Apply your custom colormap here (modify as needed)
             image = crop_image(image, depth_min, depth_max)
-            images.append(image)
+            color_image = apply_colormap(image)
+            print(image.size)
+            images.append(list(image.getdata()))
 
         return images
 
