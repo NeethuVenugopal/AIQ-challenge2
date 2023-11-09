@@ -1,7 +1,7 @@
 # AIQ-challenge2
 image processing based application
 
-# Prerequisites : 
+prerequisites:
 Need to start a MYSQL server and create a database named ‘imagedb’. The environment variables need to be changed accordingly which includes MYSQL user, password and host.
 #readandsave.py
 
