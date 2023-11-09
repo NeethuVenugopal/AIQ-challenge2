@@ -31,9 +31,11 @@ def read_image(csv_file):
 #Function to resize image to width 150 keeping aspect ratio
 def resize_image(image_data,new_width):
     img = Image.fromarray(image_data)
+    print(f'image size before resizing:{img.size}')
     width_percent = (new_width / float(img.size[0]))
     new_height = int(float(img.size[1]) * width_percent)
     img = img.resize((new_width, new_height), Image.LANCZOS)
+    print(f'image size after resizing:{img.size}')
     return img
 
 #Function to save image to database

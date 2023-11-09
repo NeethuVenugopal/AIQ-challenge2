@@ -1,4 +1,0 @@
-prerequisites
-
-my sql server running with database name imagedb , current user name is root and password is PASS@mysql
-Need to make necessary changes before running with another server
