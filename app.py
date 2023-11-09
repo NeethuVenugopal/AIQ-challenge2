@@ -8,6 +8,7 @@ import matplotlib as mpl
 import numpy as np
 import base64
 import io
+
 # Load environment variables from the .env file
 load_dotenv()
 
@@ -31,6 +32,8 @@ connection = mysql.connector.connect(
 # Create a cursor to interact with the database
 cursor = connection.cursor()
 
+
+#Function to crop the image based on depth_min and depth_max (Here depth refers to rows So eventually a cropping is happening)
 def crop_image(image, row_min, row_max):
     width, height = image.size
     if row_min < 0 or row_max > height or row_min >= row_max:
@@ -40,6 +43,7 @@ def crop_image(image, row_min, row_max):
     cropped_image = image.crop((0, row_min, width, row_max))
     return cropped_image
 
+#Function to create a custom colormap and apply this on a grayscale image to make it color image
 def apply_colormap(image):
     cdict = {'red': ((0.0, 0.0, 0.0),
                  (0.1, 0.5, 0.5),
@@ -70,10 +74,11 @@ def apply_colormap(image):
     img.save('test.png')
     return img
 
+#Function describing fastapi endpoint
 @app.get("/frames/")
 def retrieve_images(depth_min: int, depth_max: int):
     try:
-        # Retrieve image data from the database within the specified row range
+        # Retrieve image data from the database. 
         retrieve_query = "SELECT image_data FROM images"
         cursor.execute(retrieve_query)
         rows = cursor.fetchall()
@@ -84,12 +89,13 @@ def retrieve_images(depth_min: int, depth_max: int):
         images = []
 
         for row in rows:
-            # Load image data from the database and apply a custom colormap
+            # For each image, perform cropping and apply colormap
             image_data = row[0]
             image = Image.open(BytesIO(image_data))
-            # Apply your custom colormap here (modify as needed)
             image = crop_image(image, depth_min, depth_max)
             color_image = apply_colormap(image)
+
+            # Return the processed images in base64 format
             image_data = io.BytesIO()
             image.save(image_data, format='png')
             base64_image = base64.b64encode(image_data.getvalue()).decode('utf-8')

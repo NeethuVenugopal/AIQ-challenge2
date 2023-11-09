@@ -13,7 +13,7 @@ from io import BytesIO
 load_dotenv()
 
 
-
+#Function to read image from csv
 def read_image(csv_file):
     # Read the Excel data
     df = pd.read_csv(csv_file)
@@ -22,30 +22,21 @@ def read_image(csv_file):
 
     print(image_data.shape)
 
-    # Define the dimensions of the image
-    width =  image_data.shape[1]  # Image width
-    height = image_data.shape[0]  # Image height (number of rows)
-
-    # # Reshape the pixel data into a 2D array
-    # image_array = np.array(image_data).reshape((height, width))
-    # image_array = image_array / 255.0
-
-    # Display the normalized image using a specific colormap
-    plt.imshow(image_data, cmap='gray')  # You can change the colormap (e.g., 'viridis')
-    plt.axis('off')  # Hide axis labels
-    plt.title(f"Depth Image")
-    plt.show()
+    # plt.imshow(image_data, cmap='gray') 
+    # plt.axis('off')  # Hide axis labels
+    # plt.title(f"Depth Image")
+    # plt.show()
     return image_data
 
+#Function to resize image to width 150 keeping aspect ratio
 def resize_image(image_data,new_width):
-    print(image_data[1,1])
     img = Image.fromarray(image_data)
     width_percent = (new_width / float(img.size[0]))
     new_height = int(float(img.size[1]) * width_percent)
     img = img.resize((new_width, new_height), Image.LANCZOS)
-    img.show()
     return img
 
+#Function to save image to database
 def store_image(img):
     # Establish the MySQL database connection
     try:
@@ -61,7 +52,7 @@ def store_image(img):
             # Create a cursor to interact with the database
             cursor = connection.cursor()
 
-            # Define the table structure (adjust the table and column names as needed)
+            # Define the table structure 
             create_table_query = """
             CREATE TABLE IF NOT EXISTS images (
                 id INT AUTO_INCREMENT PRIMARY KEY,

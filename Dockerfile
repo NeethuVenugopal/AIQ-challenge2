@@ -1,3 +1,7 @@
+#This docker file installs necessary libraries and run the shellscript entrypoint.sh
+#entrypoint.sh will first run readandsave.py to  read and store image in database 
+#and then run fastapi application app.py
+
 # Use the official Python 3.11 image as the base image
 FROM python:3.11
 
