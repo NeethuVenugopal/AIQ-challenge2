@@ -6,13 +6,14 @@ from dotenv import load_dotenv
 import os
 import matplotlib as mpl
 import numpy as np
-
+import base64
+import io
 # Load environment variables from the .env file
 load_dotenv()
 
 # Access environment variables
-db_host = "Localhost"
-db_user = "root"
+db_host = os.getenv("HOST")
+db_user = os.getenv("USER")
 db_password = os.getenv("MYSQLPASS")
 db_name = "imagedb"
 
@@ -89,9 +90,10 @@ def retrieve_images(depth_min: int, depth_max: int):
             # Apply your custom colormap here (modify as needed)
             image = crop_image(image, depth_min, depth_max)
             color_image = apply_colormap(image)
-            print(image.size)
-            images.append(list(image.getdata()))
-
+            image_data = io.BytesIO()
+            image.save(image_data, format='png')
+            base64_image = base64.b64encode(image_data.getvalue()).decode('utf-8')
+            images.append(base64_image)
         return images
 
     except Exception as e:
@@ -99,4 +101,4 @@ def retrieve_images(depth_min: int, depth_max: int):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

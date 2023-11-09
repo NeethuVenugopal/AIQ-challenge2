@@ -50,9 +50,9 @@ def store_image(img):
     # Establish the MySQL database connection
     try:
         connection = mysql.connector.connect(
-            host="Localhost",
-            user="root",
-            password=os.getenv("MYSQLPASS"),
+            host = os.getenv("HOST"),
+            user = os.getenv("USER"),
+            password = os.getenv("MYSQLPASS"),
             database="imagedb"
         )
 
